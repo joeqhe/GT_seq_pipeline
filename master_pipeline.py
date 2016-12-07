@@ -7,10 +7,11 @@ Master script to generate "optimal" primers for GT-seq in octoploid strawberry
 1. identify densest SNP windows in vesca genome
 2. filter to remove overlapping windows
 3. reference SNPs to ensure they exist in >= 1 octoploid mapping population
-4. identify 
+4. 
 
 Run with: 
 
+import os
 working_directory = "/home/hejoe/GT_seq_primer_design"
 os.chdir (working_directory)
 os.chdir ("full_pipeline")
@@ -43,7 +44,7 @@ octoploid_mapping_populations = [
 ##########################################################################################
 
 
-window_size = 1000 # Size of window to search through in vesca
+window_size = 5000 # Size of window to search through in vesca
 window_number = 250 # Number of windows to output
 
 
@@ -54,11 +55,13 @@ window_number = 250 # Number of windows to output
 
 SNP_locations = {} # function_read_SNP_location: SNP location output dictionary 
 LG_count = {} # function_read_SNP_location: counts number of LG in input file
+
+SNP_locations_original = {} # SNP_cluster_identification.py: original vesca SNP locations
+
 bins = {} # function_generate_bins (SNP_locations, window_size): generates bins
 
-densest_SNP_window = {}
+densest_SNP_windows = {}
 # function_full_scan (SNP_locations, bins, window_size): output of results
-
 
 all_map_position = {} # function_read_map_file: SNP location output dictionary
 
@@ -73,6 +76,12 @@ for map_file in octoploid_mapping_populations:
 			
 os.chdir (working_directory)
 # function_read_map_file: populate all_map_position with dictionary for each LG
+
+remove_counter = 0 # function_remove_overlapping_windows: counts removed windows
+
+all_probeset_ID = [] # verify_marker_existence.py: list of all probsetIDs
+markers_in_octoploid = {}
+# verify_marker_existence.py: removes markers from densest_SNP_windows not in >1 octoploid map
 
 
 ##########################################################################################
@@ -92,9 +101,13 @@ execfile ("GT_seq_functions.py")
 
 os.chdir (working_directory)
 os.chdir ("full_pipeline")
+
 execfile ("SNP_cluster_identification.py")
 
-#execfile ("verify_marker_existence.py")
+os.chdir (working_directory)
+os.chdir ("full_pipeline")
+
+execfile ("verify_marker_existence.py")
 
 
 
